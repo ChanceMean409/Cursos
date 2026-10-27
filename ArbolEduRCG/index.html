@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+    <title>ArbolEduRGC - Simulador Interactivo de Árboles Binarios</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+    <!-- ENCABEZADO Y NAVEGACIÓN -->
+    <header class="encabezado">
+        <div class="logo-titulo">
+            <span class="icono-arbol">🌳</span>
+            <div>
+                <h1>ArbolEduRGC</h1>
+                <p>Plataforma Interactiva de Estructuras No Lineales (Árboles Binarios)</p>
+            </div>
+        </div>
+        <nav class="menu-modulos">
+            <button class="btn-tab activo" onclick="cambiarModulo('modulo1', this)">
+                Simulador
+            </button>
+            <button class="btn-tab" onclick="cambiarModulo('modulo2', this)">
+                Glosario
+            </button>
+            <button class="btn-tab" onclick="cambiarModulo('modulo3', this)">
+                Quiz
+            </button>
+        </nav>
+    </header>
+
+    <main class="contenedor-principal">
+
+        <!-- ===============================================================
+             MÓDULO 1: SIMULADOR
+             =============================================================== -->
+        <section id="modulo1" class="modulo activo">
+
+            <!-- Selector de Sección: Árbol de Números vs Árbol de Letras -->
+            <div class="selector-tipo-arbol">
+                <button id="btnModoNumeros" class="btn-modo activo" onclick="cambiarTipoArbol('NUMEROS')">
+                    🔢 Árbol de Números Enteros
+                </button>
+                <button id="btnModoLetras" class="btn-modo" onclick="cambiarTipoArbol('LETRAS')">
+                    🔤 Árbol de Letras (A - Z)
+                </button>
+            </div>
+
+            <!-- Barra de controles -->
+            <div class="barra-controles">
+                <div class="grupo-input">
+                    <input type="text" id="inputValor" autocomplete="off" placeholder="Ingresa un entero (ej. 45)" maxlength="5">
+                    <button class="btn btn-primario" onclick="accionInsertar()">＋ Insertar</button>
+                    <button class="btn btn-outline-ambar" onclick="accionBuscar()">🔍 Buscar</button>
+                    <button class="btn btn-outline-rojo" onclick="accionEliminar()">✖ Eliminar</button>
+                </div>
+
+                <div class="grupo-recorridos">
+                    <span class="etiqueta-grupo">Recorridos:</span>
+                    <button class="btn btn-outline-indigo" onclick="accionRecorrido('PREORDEN')">Preorden</button>
+                    <button class="btn btn-outline-indigo" onclick="accionRecorrido('INORDEN')">Inorden</button>
+                    <button class="btn btn-outline-indigo" onclick="accionRecorrido('POSTORDEN')">Postorden</button>
+                </div>
+
+                <div class="grupo-extra">
+                    <button class="btn btn-outline-cian" onclick="cargarArbolEjemplo()">⚡ Ejemplo Rápido</button>
+                    <button class="btn btn-outline-gris" onclick="limpiarSimulador()">🗑 Limpiar</button>
+                </div>
+            </div>
+
+            <!-- Barra informativa: Leyenda pedagógica + Métricas en vivo -->
+            <div class="barra-metricas-leyenda">
+                <div class="leyenda-colores">
+                    <span class="leyenda-titulo">Colores:</span>
+                    <span class="item-leyenda"><i class="punto-color color-raiz"></i> Raíz</span>
+                    <span class="item-leyenda"><i class="punto-color color-interno"></i> Interno (Padre)</span>
+                    <span class="item-leyenda"><i class="punto-color color-hoja"></i> Hoja</span>
+                </div>
+                <div class="metricas-arbol">
+                    <div class="metrica-chip">Grado: <strong id="lblGradoArbol">0</strong></div>
+                    <div class="metrica-chip">Nivel máx: <strong id="lblNivelArbol">0</strong></div>
+                    <div class="metrica-chip">Altura: <strong id="lblAlturaArbol">0</strong></div>
+                    <div class="metrica-chip">Orden: <strong id="lblOrdenArbol">0</strong></div>
+                </div>
+            </div>
+
+            <!-- Banner integrado de estado paso a paso -->
+            <div id="bannerEstado" class="banner-estado">
+                El lienzo está listo. Ingresa tu propio valor o presiona "⚡ Ejemplo Rápido" para generar un árbol aleatorio.
+            </div>
+
+            <!-- Ventana oscura con auto-centrado y auto-escalado -->
+            <div id="contenedorCanvasSimulador" class="contenedor-canvas-dinamico">
+                <canvas id="canvasSimulador"></canvas>
+            </div>
+
+            <!-- Panel inferior en dos columnas: Consola + Guía -->
+            <div class="panel-inferior-simulador">
+                <div class="consola-integrada">
+                    <div class="consola-header">
+                        <span>>_ CONSOLA EN TIEMPO REAL</span>
+                        <span id="indicadorRecursividad" class="badge-estado">En espera</span>
+                    </div>
+                    <div id="consolaSalida" class="consola-body">
+                        Esperando operaciones en el árbol...
+                    </div>
+                </div>
+
+                <div class="guia-curiosos">
+                    <div class="guia-header">
+                        <span>💡 ¿Cómo se utiliza este simulador?</span>
+                    </div>
+                    <div class="guia-grid">
+                        <div class="guia-item">
+                            <h4>1. Números o Letras</h4>
+                            <p>Elige arriba entre <strong>Números</strong> (sin decimales) o <strong>Letras</strong> (convierte a MAYÚSCULAS). Al cambiar de modo, el lienzo se limpia.</p>
+                        </div>
+                        <div class="guia-item">
+                            <h4>2. Colores Didácticos</h4>
+                            <p><strong>Azul:</strong> Nodo Raíz. <strong>Violeta:</strong> Nodo Interno (con hijos). <strong>Verde:</strong> Nodo Hoja (sin hijos).</p>
+                        </div>
+                        <div class="guia-item">
+                            <h4>3. Flecha y Métricas</h4>
+                            <p>La flecha muestra cómo avanza y regresa la recursividad. Arriba puedes ver el <strong>Grado, Nivel, Altura y Orden</strong> en vivo.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===============================================================
+             MÓDULO 2: GLOSARIO (COMPACTO Y PROPORCIONAL)
+             =============================================================== -->
+        <section id="modulo2" class="modulo">
+            <div class="teoria-layout">
+                <div class="glosario-columna-izq">
+                    <div class="glosario-encabezado-izq">
+                        <h2>Glosario Interactivo</h2>
+                        <p class="subtitulo-glosario">Toca o pasa el cursor sobre un tema para ver su explicación y animación:</p>
+                    </div>
+
+                    <div class="glosario-tarjetas-grid">
+                        <div class="tarjeta-concepto activa" onmouseenter="mostrarConcepto('raiz', this)" onclick="mostrarConcepto('raiz', this)">
+                            <span class="icono-concepto">👑</span>
+                            <div>
+                                <h3>Nodo Raíz</h3>
+                                <p>Inicio superior del árbol.</p>
+                            </div>
+                        </div>
+
+                        <div class="tarjeta-concepto" onmouseenter="mostrarConcepto('padres', this)" onclick="mostrarConcepto('padres', this)">
+                            <span class="icono-concepto">🧭</span>
+                            <div>
+                                <h3>Nodos Internos</h3>
+                                <p>Padres con al menos un hijo.</p>
+                            </div>
+                        </div>
+
+                        <div class="tarjeta-concepto" onmouseenter="mostrarConcepto('hijos', this)" onclick="mostrarConcepto('hijos', this)">
+                            <span class="icono-concepto">🌱</span>
+                            <div>
+                                <h3>Nodos Hijos</h3>
+                                <p>Descendientes izq. o der.</p>
+                            </div>
+                        </div>
+
+                        <div class="tarjeta-concepto" onmouseenter="mostrarConcepto('hojas', this)" onclick="mostrarConcepto('hojas', this)">
+                            <span class="icono-concepto">🍃</span>
+                            <div>
+                                <h3>Nodos Hojas</h3>
+                                <p>Terminales sin hijos.</p>
+                            </div>
+                        </div>
+
+                        <div class="tarjeta-concepto" onmouseenter="mostrarConcepto('subarboles', this)" onclick="mostrarConcepto('subarboles', this)">
+                            <span class="icono-concepto">🌿</span>
+                            <div>
+                                <h3>Subárboles</h3>
+                                <p>Ramas que forman otro árbol.</p>
+                            </div>
+                        </div>
+
+                        <div class="tarjeta-concepto" onmouseenter="mostrarConcepto('propiedades', this)" onclick="mostrarConcepto('propiedades', this)">
+                            <span class="icono-concepto">📐</span>
+                            <div>
+                                <h3>Grado, Nivel, Altura, Orden</h3>
+                                <p>Métricas del árbol binario.</p>
+                            </div>
+                        </div>
+
+                        <div class="tarjeta-concepto" onmouseenter="mostrarConcepto('preorden', this)" onclick="mostrarConcepto('preorden', this)">
+                            <span class="icono-concepto">1️⃣</span>
+                            <div>
+                                <h3>Preorden</h3>
+                                <p>Raíz ➔ Izq ➔ Der</p>
+                            </div>
+                        </div>
+
+                        <div class="tarjeta-concepto" onmouseenter="mostrarConcepto('inorden', this)" onclick="mostrarConcepto('inorden', this)">
+                            <span class="icono-concepto">2️⃣</span>
+                            <div>
+                                <h3>Inorden</h3>
+                                <p>Izq ➔ Raíz ➔ Der</p>
+                            </div>
+                        </div>
+
+                        <div class="tarjeta-concepto tarjeta-ancha" onmouseenter="mostrarConcepto('postorden', this)" onclick="mostrarConcepto('postorden', this)">
+                            <span class="icono-concepto">3️⃣</span>
+                            <div>
+                                <h3>Recorrido Postorden</h3>
+                                <p>Visita Izquierda ➔ Derecha ➔ Raíz al final.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="glosario-visor">
+                    <div id="cajaDetalleTeoria" class="detalle-teoria">
+                        <h2 id="tituloConcepto">👑 Nodo Raíz</h2>
+                        <p id="textoConcepto">
+                            Es el primer elemento del árbol binario y el único que no tiene padre. Todas las operaciones de inserción, búsqueda y recorrido comienzan siempre desde la Raíz.
+                        </p>
+                    </div>
+                    <div id="contenedorCanvasTeoria" class="contenedor-canvas-teoria">
+                        <canvas id="canvasTeoria"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===============================================================
+             MÓDULO 3: QUIZ PERSONALIZABLE (CON INICIO MANUAL Y RESUMEN WORDLE)
+             =============================================================== -->
+        <section id="modulo3" class="modulo">
+
+            <!-- Barra de Configuración Personalizable del Quiz -->
+            <div class="quiz-config-bar">
+                <div class="config-item">
+                    <label for="cfgModoEvaluacion">Evaluar:</label>
+                    <select id="cfgModoEvaluacion">
+                        <option value="SOLO_RECORRIDOS">Solo Recorridos (Pre/In/Post)</option>
+                        <option value="SOLO_PROPIEDADES">Por aparte: Grado, Nivel, Altura y Orden</option>
+                        <option value="COMPLETO" selected>Completo (Recorridos + Propiedades)</option>
+                    </select>
+                </div>
+                <div class="config-item">
+                    <label for="cfgNumPreguntas">Preguntas (1-20):</label>
+                    <input type="text" inputmode="numeric" id="cfgNumPreguntas" class="input-sin-flechas" value="5" maxlength="2" autocomplete="off">
+                </div>
+                <div class="config-item">
+                    <label for="cfgDificultad">Dificultad:</label>
+                    <select id="cfgDificultad">
+                        <option value="FACIL">Fácil (4 - 5 nodos)</option>
+                        <option value="MEDIA" selected>Media (6 - 7 nodos)</option>
+                        <option value="DIFICIL">Difícil (8 - 10 nodos)</option>
+                    </select>
+                </div>
+                <div class="config-item">
+                    <label for="cfgTipoArbol">Árboles:</label>
+                    <select id="cfgTipoArbol">
+                        <option value="MIXTO" selected>Mixto (Números y Letras)</option>
+                        <option value="NUMEROS">Solo Números Enteros</option>
+                        <option value="LETRAS">Solo Letras (A - Z)</option>
+                    </select>
+                </div>
+                <div class="config-item">
+                    <label for="cfgTiempo">Tiempo:</label>
+                    <select id="cfgTiempo">
+                        <option value="SIN_TIEMPO" selected>Sin límite</option>
+                        <option value="CON_TIEMPO">Contra reloj</option>
+                    </select>
+                </div>
+                <button class="btn btn-primario" onclick="iniciarQuizPersonalizado()">
+                    🚀 Comenzar Quiz
+                </button>
+            </div>
+
+            <!-- Pantalla de Espera (Lobby) antes de que el usuario inicie el Quiz -->
+            <div id="quizLobby" class="quiz-lobby">
+                <div class="lobby-icono">🎯</div>
+                <h2>Configura tu Quiz antes de comenzar</h2>
+                <p>
+                    Elige arriba cuántas preguntas deseas responder, la dificultad, si deseas evaluar <strong>solo recorridos</strong>, <strong>por aparte el Grado, Nivel, Altura y Orden</strong>, o ambos. El examen no iniciará hasta que presiones el botón.
+                </p>
+                <button class="btn btn-primario btn-grande" onclick="iniciarQuizPersonalizado()">
+                    🚀 Iniciar Quiz Ahora
+                </button>
+            </div>
+
+            <!-- Contenido activo del Quiz (Oculto hasta que el usuario lo inicie) -->
+            <div id="quizContenidoActivo" class="oculto">
+                <div class="quiz-header">
+                    <div>
+                        <h2 id="tituloPreguntaQuiz">Evaluación en Curso</h2>
+                        <p id="preguntaQuiz" class="pregunta-destacada">
+                            Analiza el árbol generado:
+                        </p>
+                    </div>
+                    <div class="marcador-quiz">
+                        <div id="cajaRelojQuiz" class="caja-puntaje reloj oculto">
+                            <span>Tiempo</span>
+                            <strong id="lblTiempoQuiz">00s</strong>
+                        </div>
+                        <div class="caja-puntaje">
+                            <span>Pregunta</span>
+                            <strong id="lblProgresoQuiz">1 / 5</strong>
+                        </div>
+                        <div class="caja-puntaje calificacion">
+                            <span>Puntaje</span>
+                            <strong id="lblCalificacion">En curso</strong>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="quiz-workspace">
+                    <div id="contenedorCanvasQuiz" class="contenedor-canvas-dinamico canvas-quiz-box">
+                        <canvas id="canvasQuiz"></canvas>
+                    </div>
+
+                    <div id="panelControlesQuiz" class="quiz-formulario">
+                        <h3>Tus Respuestas:</h3>
+
+                        <!-- Bloque de Recorrido -->
+                        <div id="bloqueInputRecorrido" class="campo-quiz">
+                            <label id="lblInputRecorrido">Secuencia del Recorrido solicitado:</label>
+                            <input type="text" id="inputRespuestaRecorrido" autocomplete="off" placeholder="Separa con espacios (ej: 50 30 70)">
+                        </div>
+
+                        <!-- Bloque de Propiedades por aparte -->
+                        <div id="bloqueInputPropiedades" class="grid-propiedades-quiz">
+                            <div class="campo-quiz">
+                                <label>Grado del árbol (0, 1 o 2):</label>
+                                <input type="text" inputmode="numeric" id="inputRespuestaGrado" autocomplete="off" placeholder="Ej: 2" maxlength="2">
+                            </div>
+                            <div class="campo-quiz">
+                                <label>Nivel máximo (Raíz = 0):</label>
+                                <input type="text" inputmode="numeric" id="inputRespuestaNivel" autocomplete="off" placeholder="Ej: 2" maxlength="2">
+                            </div>
+                            <div class="campo-quiz">
+                                <label>Altura total (Niveles):</label>
+                                <input type="text" inputmode="numeric" id="inputRespuestaAltura" autocomplete="off" placeholder="Ej: 3" maxlength="2">
+                            </div>
+                            <div class="campo-quiz">
+                                <label>Orden (Total de nodos):</label>
+                                <input type="text" inputmode="numeric" id="inputRespuestaOrden" autocomplete="off" placeholder="Ej: 6" maxlength="3">
+                            </div>
+                        </div>
+
+                        <button id="btnResponderQuiz" class="btn btn-primario btn-ancho" onclick="verificarRespuestaQuiz()">
+                            ✔ Calificar y Siguiente
+                        </button>
+
+                        <div id="feedbackQuiz" class="feedback-quiz oculto"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- MODAL DE RESUMEN FINAL ESTILO WORDLE -->
+            <div id="modalResumenWordle" class="modal-overlay oculto">
+                <div class="modal-wordle-card">
+                    <div class="modal-wordle-header">
+                        <h2>📊 Resumen de tu Partida</h2>
+                        <button class="btn-cerrar-modal" onclick="cerrarModalResumen()">✕</button>
+                    </div>
+
+                    <div class="wordle-stats-row">
+                        <div class="stat-box">
+                            <strong id="statTotalPreguntas">0</strong>
+                            <span>Preguntas</span>
+                        </div>
+                        <div class="stat-box">
+                            <strong id="statCalificacionFinal">0%</strong>
+                            <span>Calificación</span>
+                        </div>
+                        <div class="stat-box">
+                            <strong id="statPerfectas">0</strong>
+                            <span>Perfectas</span>
+                        </div>
+                    </div>
+
+                    <div class="wordle-patron-contenedor">
+                        <span>Desempeño por pregunta:</span>
+                        <div id="wordleEmojisGrid" class="wordle-emojis-grid"></div>
+                    </div>
+
+                    <div class="wordle-desglose-titulo">Detalle de en qué estuviste bien y en qué fallaste:</div>
+                    <div id="wordleListaDetalle" class="wordle-lista-detalle"></div>
+
+                    <div class="modal-wordle-footer">
+                        <button class="btn btn-outline-gris" onclick="volverAConfiguracionQuiz()">⚙ Cambiar Opciones</button>
+                        <button class="btn btn-primario" onclick="iniciarQuizPersonalizado()">🔄 Jugar de Nuevo</button>
+                    </div>
+                </div>
+            </div>
+
+        </section>
+
+    </main>
+
+    <script src="ArbolBinario.js"></script>
+</body>
+</html>
