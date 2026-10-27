@@ -5,6 +5,8 @@
  * ============================================================================
  */
 
+const ALFABETO_ESP = 'ABCDEFGHIJKLMNÑOPQRSTUVWXYZ';
+
 class Nodo {
     constructor(dato) {
         this.dato = String(dato).trim();
@@ -23,6 +25,11 @@ class ArbolBinario {
         this.tipo = tipo; // 'NUMEROS' o 'LETRAS'
     }
 
+    /**
+     * Compara dos valores:
+     * - En NÚMEROS: compara enteros exactos.
+     * - En LETRAS: usa el orden estricto del alfabeto español (incluyendo la Ñ).
+     */
     comparar(a, b) {
         if (this.tipo === 'NUMEROS') {
             const numA = parseInt(a, 10);
@@ -31,7 +38,16 @@ class ArbolBinario {
             if (numA > numB) return 1;
             return 0;
         } else {
-            return String(a).localeCompare(String(b), undefined, { sensitivity: 'base' });
+            const letraA = String(a).toUpperCase();
+            const letraB = String(b).toUpperCase();
+            const idxA = ALFABETO_ESP.indexOf(letraA);
+            const idxB = ALFABETO_ESP.indexOf(letraB);
+            if (idxA !== -1 && idxB !== -1) {
+                if (idxA < idxB) return -1;
+                if (idxA > idxB) return 1;
+                return 0;
+            }
+            return letraA.localeCompare(letraB);
         }
     }
 
@@ -345,7 +361,7 @@ class ArbolBinario {
 
 /**
  * ============================================================================
- * PARTE 2: SIMULADOR Y POSICIONAMIENTO ANTI-COLISIONES (NÚMEROS Y LETRAS)
+ * PARTE 2: SIMULADOR, CONSOLA SIN CORTES Y COLUMNA EXCLUSIVA POR NODO
  * ============================================================================
  */
 
@@ -371,6 +387,27 @@ const flechaAnimada = {
     etiqueta: 'RAÍZ',
     rebote: 0
 };
+
+// Funciones auxiliares para imprimir en la consola con etiquetas indivisibles (sin cortes feos)
+function iniciarConsolaConTitulo(titulo) {
+    const consola = document.getElementById('consolaSalida');
+    consola.innerHTML = `<span class="consola-etiqueta">${titulo}</span>`;
+}
+
+function agregarChipConsola(valor, conFlecha = false) {
+    const consola = document.getElementById('consolaSalida');
+    const chip = document.createElement('span');
+    chip.className = 'consola-chip';
+    chip.textContent = `[ ${valor} ]`;
+    consola.appendChild(chip);
+
+    if (conFlecha) {
+        const flecha = document.createElement('span');
+        flecha.className = 'consola-flecha-paso';
+        flecha.textContent = '➔';
+        consola.appendChild(flecha);
+    }
+}
 
 function cambiarModulo(idModulo, botonClickeado) {
     document.querySelectorAll('.modulo').forEach(m => m.classList.remove('activo'));
@@ -459,7 +496,8 @@ function accionInsertar() {
     input.value = '';
     const pasos = arbolSimulador.insertarConPasos(valorValidado);
     actualizarPanelMetricasSimulador();
-    document.getElementById('consolaSalida').textContent = `Insertando nodo: ${valorValidado}`;
+    iniciarConsolaConTitulo('INSERTANDO:');
+    agregarChipConsola(valorValidado, false);
     reproducirAnimacionPasos(pasos, false);
 }
 
@@ -473,7 +511,7 @@ function accionBuscar() {
         return;
     }
     const pasos = arbolSimulador.buscarConPasos(valorValidado);
-    document.getElementById('consolaSalida').textContent = `Ruta buscando '${valorValidado}': `;
+    iniciarConsolaConTitulo(`BUSCANDO '${valorValidado}':`);
     reproducirAnimacionPasos(pasos, true);
 }
 
@@ -488,7 +526,7 @@ function accionEliminar() {
     }
     input.value = '';
     const pasosBusqueda = arbolSimulador.buscarConPasos(valorValidado);
-    document.getElementById('consolaSalida').textContent = `Buscando '${valorValidado}' para eliminar: `;
+    iniciarConsolaConTitulo(`ELIMINANDO '${valorValidado}':`);
 
     reproducirAnimacionPasos(pasosBusqueda, true, () => {
         const ultimoPaso = pasosBusqueda[pasosBusqueda.length - 1];
@@ -497,7 +535,8 @@ function accionEliminar() {
             limpiarResaltadosSimulador();
             actualizarPanelMetricasSimulador();
             actualizarBanner(`Nodo '${valorValidado}' eliminado y árbol reestructurado.`, '#10b981');
-            document.getElementById('consolaSalida').textContent = `Nodo '${valorValidado}' eliminado.`;
+            iniciarConsolaConTitulo('ELIMINADO:');
+            agregarChipConsola(valorValidado, false);
         }
     });
 }
@@ -516,8 +555,7 @@ function accionRecorrido(tipo) {
     if (tipo === 'INORDEN') pasos = arbolSimulador.obtenerPasosInorden();
     if (tipo === 'POSTORDEN') pasos = arbolSimulador.obtenerPasosPostorden();
 
-    const consola = document.getElementById('consolaSalida');
-    consola.textContent = `${tipo}: `;
+    iniciarConsolaConTitulo(`${tipo}:`);
     document.getElementById('indicadorRecursividad').textContent = `Recorriendo ${tipo}...`;
 
     detenerAnimacion();
@@ -552,7 +590,7 @@ function accionRecorrido(tipo) {
                 if (!nodosProcesados.includes(paso.nodo)) {
                     nodosProcesados.push(paso.nodo);
                 }
-                consola.textContent += `[ ${paso.consola} ]  `;
+                agregarChipConsola(paso.consola, false);
                 actualizarBanner(paso.mensaje, '#ef4444');
             } else {
                 actualizarBanner(paso.mensaje, '#38bdf8');
@@ -601,7 +639,7 @@ function reproducirAnimacionPasos(pasos, mantenerCamino, callbackFinal = null) {
                 if (paso.procesar) nodosProcesados.push(paso.nodo);
 
                 if (mantenerCamino) {
-                    document.getElementById('consolaSalida').textContent += `${paso.nodo.dato} ➔ `;
+                    agregarChipConsola(paso.nodo.dato, i < pasos.length - 1);
                 }
             }
             actualizarBanner(paso.mensaje, '#38bdf8');
@@ -662,9 +700,8 @@ function cargarArbolEjemplo() {
             }
         }
     } else {
-        const alfabeto = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
         while (usados.size < cantidadNodos) {
-            const letra = alfabeto[Math.floor(Math.random() * alfabeto.length)];
+            const letra = ALFABETO_ESP[Math.floor(Math.random() * ALFABETO_ESP.length)];
             if (!usados.has(letra)) {
                 usados.add(letra);
                 arbolSimulador.insertarConPasos(letra);
@@ -675,7 +712,8 @@ function cargarArbolEjemplo() {
 
     actualizarPanelMetricasSimulador();
     actualizarBanner(`Árbol aleatorio generado (${generados.join(', ')}). ¡Prueba los recorridos!`, '#10b981');
-    document.getElementById('consolaSalida').textContent = `Nodos insertados: ${generados.join(', ')}`;
+    iniciarConsolaConTitulo('GENERADOS:');
+    generados.forEach(g => agregarChipConsola(g, false));
 }
 
 function actualizarBanner(texto, colorBorde) {
@@ -685,7 +723,7 @@ function actualizarBanner(texto, colorBorde) {
 }
 
 // ============================================================================
-// MOTOR DE RENDERIZADO SIN SUPERPOSICIÓN DE NODOS (INORDEN + CENTRADO DE PADRES)
+// MOTOR DE POSICIONAMIENTO PURO POR COLUMNAS INORDEN (0% SUPERPOSICIÓN)
 // ============================================================================
 
 function ajustarCanvasNitido(idCanvas, idContenedor) {
@@ -717,37 +755,25 @@ window.addEventListener('resize', () => {
 });
 
 /**
- * Asigna a cada nodo una columna horizontal única basada en su recorrido Inorden
- * y centra los padres de abajo hacia arriba cuando tienen dos hijos, garantizando
- * que dos nodos (sean números o letras) jamás tengan la misma coordenada X.
+ * Asigna a cada nodo su propia columna horizontal exclusiva (0, 1, 2, 3...)
+ * en orden Inorden estricto sin desplazar jamás ningún nodo hacia la columna de otro.
+ * Así es 100% imposible que 'M' y 'Ñ' (o cualquier número) se encimen.
  */
 function asignarCoordenadasSinTraslape(raiz) {
-    let indiceColumna = 0;
-    const SEPARACION_COLUMNA_X = 60;
-    const SEPARACION_NIVEL_Y = 84;
+    let columnaExclusiva = 0;
+    const ANCHO_COLUMNA_X = 64;
+    const ALTO_NIVEL_Y = 82;
 
-    // 1. Asignación inicial en orden estricto de izquierda a derecha (0% colisiones)
-    function recorrerInorden(nodo, nivel) {
+    function asignarInordenPuro(nodo, nivel) {
         if (!nodo) return;
-        recorrerInorden(nodo.izquierdo, nivel + 1);
-        nodo.lx = indiceColumna * SEPARACION_COLUMNA_X;
-        nodo.ly = nivel * SEPARACION_NIVEL_Y;
-        indiceColumna++;
-        recorrerInorden(nodo.derecho, nivel + 1);
+        asignarInordenPuro(nodo.izquierdo, nivel + 1);
+        nodo.lx = columnaExclusiva * ANCHO_COLUMNA_X;
+        nodo.ly = nivel * ALTO_NIVEL_Y;
+        columnaExclusiva++;
+        asignarInordenPuro(nodo.derecho, nivel + 1);
     }
-    recorrerInorden(raiz, 0);
 
-    // 2. Si un padre tiene ambos hijos, lo centra suavemente entre ellos
-    //    (manteniendo siempre los subárboles izquierdo y derecho separados)
-    function centrarPadresConDosHijos(nodo) {
-        if (!nodo) return;
-        centrarPadresConDosHijos(nodo.izquierdo);
-        centrarPadresConDosHijos(nodo.derecho);
-        if (nodo.izquierdo && nodo.derecho) {
-            nodo.lx = (nodo.izquierdo.lx + nodo.derecho.lx) / 2;
-        }
-    }
-    centrarPadresConDosHijos(raiz);
+    asignarInordenPuro(raiz, 0);
 }
 
 function posicionarYAutoAjustarArbol(arbol, anchoCanvas, altoCanvas) {
@@ -1250,9 +1276,8 @@ function generarPreguntaQuiz() {
             }
         }
     } else {
-        const letras = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
         while (usados.size < cantidad) {
-            const l = letras[Math.floor(Math.random() * letras.length)];
+            const l = ALFABETO_ESP[Math.floor(Math.random() * ALFABETO_ESP.length)];
             if (!usados.has(l)) {
                 usados.add(l);
                 arbolQuiz.insertarConPasos(l);
