@@ -199,7 +199,7 @@ class ArbolBinario {
             nodoActual.derecho = this._eliminarRecursivo(nodoActual.derecho, valor);
         } else {
             if (nodoActual.izquierdo === null) return nodoActual.derecho;
-            if (nodoActual.derecho === null) return nodoActual.izquierdo;
+            if (nodoActual.derecho === null) return nodoActual.derecho;
 
             let sucesor = this._encontrarMinimo(nodoActual.derecho);
             nodoActual.dato = sucesor.dato;
@@ -345,7 +345,7 @@ class ArbolBinario {
 
 /**
  * ============================================================================
- * PARTE 2: SIMULADOR Y MOTOR MULTI-PANTALLA ESTABLE
+ * PARTE 2: SIMULADOR Y POSICIONAMIENTO ANTI-COLISIONES (NÚMEROS Y LETRAS)
  * ============================================================================
  */
 
@@ -685,7 +685,7 @@ function actualizarBanner(texto, colorBorde) {
 }
 
 // ============================================================================
-// MOTOR DE RENDERIZADO ESTABLE (SIN BUCLE DE EXPANSIÓN EN CSS GRID)
+// MOTOR DE RENDERIZADO SIN SUPERPOSICIÓN DE NODOS (INORDEN + CENTRADO DE PADRES)
 // ============================================================================
 
 function ajustarCanvasNitido(idCanvas, idContenedor) {
@@ -693,7 +693,6 @@ function ajustarCanvasNitido(idCanvas, idContenedor) {
     const contenedor = document.getElementById(idContenedor);
     if (!canvas || !contenedor) return { ctx: null, ancho: 0, alto: 0 };
 
-    // Usa clientWidth y clientHeight (excluye bordes para que nunca crezca infinitamente)
     const anchoCSS = Math.max(240, contenedor.clientWidth);
     const altoCSS = Math.max(200, contenedor.clientHeight);
     const dpr = window.devicePixelRatio || 1;
@@ -717,34 +716,44 @@ window.addEventListener('resize', () => {
     }
 });
 
-function contarUnidadesAncho(nodo) {
-    if (!nodo) return 0;
-    if (!nodo.izquierdo && !nodo.derecho) return 1;
-    return Math.max(1, contarUnidadesAncho(nodo.izquierdo)) + Math.max(1, contarUnidadesAncho(nodo.derecho));
-}
+/**
+ * Asigna a cada nodo una columna horizontal única basada en su recorrido Inorden
+ * y centra los padres de abajo hacia arriba cuando tienen dos hijos, garantizando
+ * que dos nodos (sean números o letras) jamás tengan la misma coordenada X.
+ */
+function asignarCoordenadasSinTraslape(raiz) {
+    let indiceColumna = 0;
+    const SEPARACION_COLUMNA_X = 60;
+    const SEPARACION_NIVEL_Y = 84;
 
-function asignarCoordenadasLogicas(nodo, lx, ly) {
-    if (!nodo) return;
-    nodo.lx = lx;
-    nodo.ly = ly;
-
-    const PASO_BASE_X = 52;
-    const PASO_NIVEL_Y = 84;
-
-    if (nodo.izquierdo) {
-        const empuje = Math.max(1, contarUnidadesAncho(nodo.izquierdo.derecho));
-        asignarCoordenadasLogicas(nodo.izquierdo, lx - empuje * PASO_BASE_X, ly + PASO_NIVEL_Y);
+    // 1. Asignación inicial en orden estricto de izquierda a derecha (0% colisiones)
+    function recorrerInorden(nodo, nivel) {
+        if (!nodo) return;
+        recorrerInorden(nodo.izquierdo, nivel + 1);
+        nodo.lx = indiceColumna * SEPARACION_COLUMNA_X;
+        nodo.ly = nivel * SEPARACION_NIVEL_Y;
+        indiceColumna++;
+        recorrerInorden(nodo.derecho, nivel + 1);
     }
-    if (nodo.derecho) {
-        const empuje = Math.max(1, contarUnidadesAncho(nodo.derecho.izquierdo));
-        asignarCoordenadasLogicas(nodo.derecho, lx + empuje * PASO_BASE_X, ly + PASO_NIVEL_Y);
+    recorrerInorden(raiz, 0);
+
+    // 2. Si un padre tiene ambos hijos, lo centra suavemente entre ellos
+    //    (manteniendo siempre los subárboles izquierdo y derecho separados)
+    function centrarPadresConDosHijos(nodo) {
+        if (!nodo) return;
+        centrarPadresConDosHijos(nodo.izquierdo);
+        centrarPadresConDosHijos(nodo.derecho);
+        if (nodo.izquierdo && nodo.derecho) {
+            nodo.lx = (nodo.izquierdo.lx + nodo.derecho.lx) / 2;
+        }
     }
+    centrarPadresConDosHijos(raiz);
 }
 
 function posicionarYAutoAjustarArbol(arbol, anchoCanvas, altoCanvas) {
     if (!arbol.raiz) return 20;
 
-    asignarCoordenadasLogicas(arbol.raiz, 0, 0);
+    asignarCoordenadasSinTraslape(arbol.raiz);
 
     let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
     function buscarLimites(n) {
