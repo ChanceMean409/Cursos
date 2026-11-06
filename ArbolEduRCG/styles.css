@@ -13,7 +13,6 @@ input::-webkit-inner-spin-button {
 }
 input[type="number"] {
     -moz-appearance: textfield;
-    appearance: textfield;
 }
 
 body {
@@ -175,9 +174,14 @@ input:focus, select:focus {
 }
 
 .input-sin-flechas {
-    width: 64px;
+    width: 68px;
     text-align: center;
     font-weight: 700;
+}
+
+.input-error {
+    border-color: #ef4444 !important;
+    box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.25);
 }
 
 .btn {
@@ -331,7 +335,6 @@ input:focus, select:focus {
     box-shadow: inset 0 0 24px rgba(0, 0, 0, 0.35);
 }
 
-/* El canvas se adapta al 100% de su contenedor padre sin empujarlo nunca */
 canvas {
     display: block;
     width: 100%;
@@ -458,7 +461,7 @@ canvas {
 }
 
 /* =========================================================
-   MÓDULO 2: GLOSARIO COMPACTO (CON BLOQUEO DE EXPANSIÓN)
+   MÓDULO 2: GLOSARIO COMPACTO
    ========================================================= */
 .teoria-layout {
     display: grid;

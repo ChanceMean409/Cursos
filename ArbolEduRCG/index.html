@@ -74,7 +74,7 @@
                 <div class="leyenda-colores">
                     <span class="leyenda-titulo">Colores:</span>
                     <span class="item-leyenda"><i class="punto-color color-raiz"></i> Raíz</span>
-                    <span class="item-leyenda"><i class="punto-color color-interno"></i> Interno (Padre)</span>
+                    <span class="item-leyenda"><i class="punto-color color-interno"></i> Padre</span>
                     <span class="item-leyenda"><i class="punto-color color-hoja"></i> Hoja</span>
                 </div>
                 <div class="metricas-arbol">
@@ -114,11 +114,11 @@
                     <div class="guia-grid">
                         <div class="guia-item">
                             <h4>1. Números o Letras</h4>
-                            <p>Elige arriba entre <strong>Números</strong> (sin decimales) o <strong>Letras</strong> (convierte a MAYÚSCULAS). Al cambiar de modo, el lienzo se limpia.</p>
+                            <p>Elige arriba entre <strong>Números</strong> (sin decimales) o <strong>Letras</strong>. Al cambiar de modo, el lienzo se limpia.</p>
                         </div>
                         <div class="guia-item">
                             <h4>2. Colores Didácticos</h4>
-                            <p><strong>Azul:</strong> Nodo Raíz. <strong>Violeta:</strong> Nodo Interno (con hijos). <strong>Verde:</strong> Nodo Hoja (sin hijos).</p>
+                            <p><strong>Azul:</strong> Nodo Raíz. <strong>Violeta:</strong> Nodo Padre (con hijos). <strong>Verde:</strong> Nodo Hoja (sin hijos).</p>
                         </div>
                         <div class="guia-item">
                             <h4>3. Flecha y Métricas</h4>
@@ -152,8 +152,8 @@
                         <div class="tarjeta-concepto" onmouseenter="mostrarConcepto('padres', this)" onclick="mostrarConcepto('padres', this)">
                             <span class="icono-concepto">🧭</span>
                             <div>
-                                <h3>Nodos Internos</h3>
-                                <p>Padres con al menos un hijo.</p>
+                                <h3>Nodos Padres</h3>
+                                <p>Nodos con al menos un hijo.</p>
                             </div>
                         </div>
 
@@ -246,7 +246,7 @@
                 </div>
                 <div class="config-item">
                     <label for="cfgNumPreguntas">Preguntas (1-20):</label>
-                    <input type="text" inputmode="numeric" id="cfgNumPreguntas" class="input-sin-flechas" value="5" maxlength="2" autocomplete="off">
+                    <input type="text" inputmode="numeric" id="cfgNumPreguntas" class="input-sin-flechas" value="5" maxlength="3" autocomplete="off">
                 </div>
                 <div class="config-item">
                     <label for="cfgDificultad">Dificultad:</label>
@@ -276,12 +276,15 @@
                 </button>
             </div>
 
+            <!-- Mensaje de error si el usuario ingresa más de 20 preguntas o un número inválido -->
+            <div id="errorConfigQuiz" class="feedback-quiz incorrecto oculto" style="margin-bottom: 14px;"></div>
+
             <!-- Pantalla de Espera (Lobby) antes de que el usuario inicie el Quiz -->
             <div id="quizLobby" class="quiz-lobby">
                 <div class="lobby-icono">🎯</div>
                 <h2>Configura tu Quiz antes de comenzar</h2>
                 <p>
-                    Elige arriba cuántas preguntas deseas responder, la dificultad, si deseas evaluar <strong>solo recorridos</strong>, <strong>por aparte el Grado, Nivel, Altura y Orden</strong>, o ambos. El examen no iniciará hasta que presiones el botón.
+                    Elige arriba cuántas preguntas deseas responder (entre 1 y 20), la dificultad, si deseas evaluar <strong>solo recorridos</strong>, <strong>por aparte el Grado, Nivel, Altura y Orden</strong>, o ambos. El examen no iniciará hasta que presiones el botón.
                 </p>
                 <button class="btn btn-primario btn-grande" onclick="iniciarQuizPersonalizado()">
                     🚀 Iniciar Quiz Ahora

@@ -82,6 +82,12 @@ class ArbolBinario {
 
     // ==================== OPERACIONES CON PASOS ====================
 
+    /**
+     * Inserta un valor en el árbol binario:
+     * - Si es menor (cmp < 0), baja a la IZQUIERDA.
+     * - Si es mayor o repetido/igual (cmp >= 0), ya sea en la Raíz, en un Padre
+     *   o en una Hoja, se coloca hacia la DERECHA respetando la lógica del ABB.
+     */
     insertarConPasos(valor) {
         const pasos = [];
         if (this.raiz === null) {
@@ -99,16 +105,8 @@ class ArbolBinario {
         let actual = this.raiz;
         while (true) {
             const cmp = this.comparar(valor, actual.dato);
-            if (cmp === 0) {
-                pasos.push({
-                    nodo: actual,
-                    mensaje: `El valor '${valor}' ya existe en el árbol (no se duplican valores).`,
-                    consola: null,
-                    procesar: false,
-                    etiqueta: 'YA EXISTE'
-                });
-                break;
-            } else if (cmp < 0) {
+
+            if (cmp < 0) {
                 pasos.push({
                     nodo: actual,
                     mensaje: `Comparando '${valor}' < '${actual.dato}' ➔ La flecha baja a la IZQUIERDA`,
@@ -129,18 +127,29 @@ class ArbolBinario {
                 }
                 actual = actual.izquierdo;
             } else {
+                // cmp > 0 (mayor) o cmp === 0 (repetido en Raíz, Padre o Hoja): va a la DERECHA
+                const esRepetido = (cmp === 0);
+                const rolNodo = (actual === this.raiz)
+                    ? 'la Raíz'
+                    : ((actual.izquierdo === null && actual.derecho === null) ? 'una Hoja' : 'un Padre');
+
                 pasos.push({
                     nodo: actual,
-                    mensaje: `Comparando '${valor}' > '${actual.dato}' ➔ La flecha baja a la DERECHA`,
+                    mensaje: esRepetido
+                        ? `Valor repetido '${valor}' en ${rolNodo} '${actual.dato}' ➔ Baja a la DERECHA`
+                        : `Comparando '${valor}' > '${actual.dato}' ➔ La flecha baja a la DERECHA`,
                     consola: null,
                     procesar: false,
-                    etiqueta: 'ES MAYOR (DER)'
+                    etiqueta: esRepetido ? 'IGUAL (DER)' : 'ES MAYOR (DER)'
                 });
+
                 if (actual.derecho === null) {
                     actual.derecho = new Nodo(valor);
                     pasos.push({
                         nodo: actual.derecho,
-                        mensaje: `¡Posición encontrada! Se inserta '${valor}' a la derecha de '${actual.dato}'.`,
+                        mensaje: esRepetido
+                            ? `¡Posición encontrada! Se inserta el repetido '${valor}' a la derecha de '${actual.dato}'.`
+                            : `¡Posición encontrada! Se inserta '${valor}' a la derecha de '${actual.dato}'.`,
                         consola: valor,
                         procesar: true,
                         etiqueta: 'INSERTADO'
@@ -215,7 +224,7 @@ class ArbolBinario {
             nodoActual.derecho = this._eliminarRecursivo(nodoActual.derecho, valor);
         } else {
             if (nodoActual.izquierdo === null) return nodoActual.derecho;
-            if (nodoActual.derecho === null) return nodoActual.derecho;
+            if (nodoActual.derecho === null) return nodoActual.izquierdo;
 
             let sucesor = this._encontrarMinimo(nodoActual.derecho);
             nodoActual.dato = sucesor.dato;
@@ -388,7 +397,6 @@ const flechaAnimada = {
     rebote: 0
 };
 
-// Funciones auxiliares para imprimir en la consola con etiquetas indivisibles (sin cortes feos)
 function iniciarConsolaConTitulo(titulo) {
     const consola = document.getElementById('consolaSalida');
     consola.innerHTML = `<span class="consola-etiqueta">${titulo}</span>`;
@@ -443,9 +451,9 @@ function cambiarTipoArbol(nuevoModo) {
     } else {
         btnLet.classList.add('activo');
         btnNum.classList.remove('activo');
-        input.placeholder = 'Ingresa una letra (ej. m o M)';
+        input.placeholder = 'Ingresa una letra (ej. M)';
         input.maxLength = 1;
-        actualizarBanner('Modo Letras activo (convierte a MAYÚSCULAS). Lienzo limpio: ingresa letras o usa "⚡ Ejemplo Rápido".', '#38bdf8');
+        actualizarBanner('Modo Letras activo. Lienzo limpio: ingresa letras o usa "⚡ Ejemplo Rápido".', '#38bdf8');
     }
 
     input.value = '';
@@ -754,11 +762,6 @@ window.addEventListener('resize', () => {
     }
 });
 
-/**
- * Asigna a cada nodo su propia columna horizontal exclusiva (0, 1, 2, 3...)
- * en orden Inorden estricto sin desplazar jamás ningún nodo hacia la columna de otro.
- * Así es 100% imposible que 'M' y 'Ñ' (o cualquier número) se encimen.
- */
 function asignarCoordenadasSinTraslape(raiz) {
     let columnaExclusiva = 0;
     const ANCHO_COLUMNA_X = 64;
@@ -981,12 +984,12 @@ const diccionarioTeoria = {
         texto: 'Es el nodo superior donde comienza el árbol (color Azul Cian). No tiene padre y su nivel siempre es 0. En el diagrama de abajo, el nodo 50 es la Raíz.'
     },
     padres: {
-        titulo: '🧭 Nodos Internos (Padres)',
-        texto: 'Son los nodos intermedios que tienen al menos un hijo conectado debajo (color Violeta). En el ejemplo, el 30 es un nodo interno porque es padre de 20 y 40.'
+        titulo: '🧭 Nodos Padres',
+        texto: 'Son los nodos que tienen al menos un hijo conectado debajo de ellos (color Violeta). En el ejemplo, el 50 es padre de 30 y 70, y el 30 es padre de 20 y 40.'
     },
     hijos: {
         titulo: '🌱 Nodos Hijos',
-        texto: 'Son los nodos que descienden directamente de un nodo padre. Cada nodo puede tener como máximo dos hijos: Izquierdo (menores) y Derecho (mayores).'
+        texto: 'Son los nodos que descienden directamente de un nodo padre. Cada nodo puede tener como máximo dos hijos: Izquierdo (menores) y Derecho (mayores o iguales).'
     },
     hojas: {
         titulo: '🍃 Nodos Hojas (Terminales)',
@@ -1169,7 +1172,7 @@ function bucleAnimacionGeneral() {
 }
 
 // ============================================================================
-// MÓDULO 3: QUIZ CON INICIO MANUAL, MODO POR APARTE Y RESUMEN WORDLE
+// MÓDULO 3: QUIZ CON VALIDACIÓN ESTRICTA DE PREGUNTAS (1 A 20)
 // ============================================================================
 
 let modoEvaluacionConfig = 'COMPLETO';
@@ -1199,15 +1202,35 @@ function cerrarModalResumen() {
 }
 
 function iniciarQuizPersonalizado() {
+    const inputPreguntas = document.getElementById('cfgNumPreguntas');
+    const cajaErrorConfig = document.getElementById('errorConfigQuiz');
+    const textoCant = inputPreguntas.value.trim();
+
+    // Validación estricta: no modifica el valor escrito por el usuario y bloquea el inicio si no está entre 1 y 20
+    if (!/^\d+$/.test(textoCant)) {
+        cajaErrorConfig.textContent = '⚠️ Error: Ingresa un número entero válido entre 1 y 20 en la cantidad de preguntas para poder iniciar el Quiz.';
+        cajaErrorConfig.classList.remove('oculto');
+        inputPreguntas.classList.add('input-error');
+        return;
+    }
+
+    const numInput = parseInt(textoCant, 10);
+    if (numInput > 20 || numInput < 1) {
+        cajaErrorConfig.textContent = `⚠️ Error: Ingresaste "${textoCant}" preguntas. El límite permitido es de 1 a 20 preguntas. Corrige el número indicado arriba para poder iniciar el Quiz.`;
+        cajaErrorConfig.classList.remove('oculto');
+        inputPreguntas.classList.add('input-error');
+        return;
+    }
+
+    // Si el número es válido (1 a 20), oculta el error y arranca el Quiz
+    cajaErrorConfig.classList.add('oculto');
+    inputPreguntas.classList.remove('input-error');
+
     detenerRelojQuiz();
     document.getElementById('modalResumenWordle').classList.add('oculto');
 
     modoEvaluacionConfig = document.getElementById('cfgModoEvaluacion').value;
-
-    const numInput = parseInt(document.getElementById('cfgNumPreguntas').value.trim(), 10);
-    totalPreguntasConfig = (!isNaN(numInput) && numInput >= 1 && numInput <= 20) ? numInput : 5;
-    document.getElementById('cfgNumPreguntas').value = totalPreguntasConfig;
-
+    totalPreguntasConfig = numInput;
     dificultadConfig = document.getElementById('cfgDificultad').value;
     tipoArbolConfig = document.getElementById('cfgTipoArbol').value;
     modoTiempoConfig = document.getElementById('cfgTiempo').value;
