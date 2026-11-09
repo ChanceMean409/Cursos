@@ -12,4 +12,5 @@ class Nodo {
         this.x = 0;                      // Coordenada X real en el canvas
         this.y = 0;                      // Coordenada Y real en el canvas
     }
+    //comentario
 }
