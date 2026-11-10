@@ -27,17 +27,16 @@ class ArbolBinario {
         }
     }
 
-    // Calcula la cantidad de niveles desde la raíz hasta la hoja más lejana
+    // Calcula la altura total del árbol de forma recursiva
     obtenerAltura(nodo = this.raiz) {
         if (nodo === null) return 0;
         return 1 + Math.max(this.obtenerAltura(nodo.izquierdo), this.obtenerAltura(nodo.derecho));
     }
 
-    // Devuelve el nivel máximo del árbol (contando la Raíz desde Nivel 1)
-    // Nota: Si tu maestra cuenta la Raíz como Nivel 0, cambia esta línea a: return this.obtenerAltura(this.raiz) - 1;
+    // Devuelve el nivel máximo alcanzado iniciando desde 0 en la Raíz
     obtenerNivelMaximo() {
         if (this.raiz === null) return 0;
-        return this.obtenerAltura(this.raiz);
+        return this.obtenerAltura(this.raiz) - 1;
     }
 
     // Obtiene el grado del árbol (máximo de hijos directos que tiene un nodo: 0, 1 o 2)
@@ -53,13 +52,13 @@ class ArbolBinario {
         );
     }
 
-    // Devuelve el Orden del árbol (en un árbol binario por definición siempre es 2)
+    // Devuelve el Orden del árbol (en un árbol binario por definición es 2)
     obtenerOrden() {
         if (this.raiz === null) return 0;
         return 2;
     }
 
-    // Cuenta la cantidad total de nodos (Peso del árbol)
+    // Cuenta la cantidad total de nodos en el árbol
     obtenerTotalNodos(nodo = this.raiz) {
         if (nodo === null) return 0;
         return 1 + this.obtenerTotalNodos(nodo.izquierdo) + this.obtenerTotalNodos(nodo.derecho);

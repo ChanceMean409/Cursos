@@ -69,8 +69,11 @@
                 </div>
             </div>
 
-            <!-- Barra informativa: Leyenda pedagógica + Métricas en vivo -->
+            <!-- Barra informativa: Métricas en vivo (sin leyenda de colores por rol) -->
             <div class="barra-metricas-leyenda">
+                <div class="leyenda-colores">
+                    <span class="leyenda-titulo">Métricas del Árbol Binario en Tiempo Real:</span>
+                </div>
                 <div class="metricas-arbol">
                     <div class="metrica-chip">Grado: <strong id="lblGradoArbol">0</strong></div>
                     <div class="metrica-chip">Nivel máx: <strong id="lblNivelArbol">0</strong></div>
@@ -107,12 +110,12 @@
                     </div>
                     <div class="guia-grid">
                         <div class="guia-item">
-                        <h4>2. Inserción y Búsqueda</h4>
-                        <p>Los valores menores se ubican a la izquierda y los mayores o repetidos se colocan hacia la derecha.</p>
+                            <h4>1. Números o Letras</h4>
+                            <p>Elige arriba entre <strong>Números</strong> (sin decimales) o <strong>Letras</strong>. Al cambiar de modo, el lienzo se limpia.</p>
                         </div>
                         <div class="guia-item">
-                            <h4>2. Colores Didácticos</h4>
-                            <p><strong>Azul:</strong> Nodo Raíz. <strong>Violeta:</strong> Nodo Padre (con hijos). <strong>Verde:</strong> Nodo Hoja (sin hijos).</p>
+                            <h4>2. Regla de Inserción</h4>
+                            <p>Los valores <strong>menores</strong> se ubican a la izquierda y los valores <strong>mayores o repetidos</strong> se colocan a la derecha.</p>
                         </div>
                         <div class="guia-item">
                             <h4>3. Flecha y Métricas</h4>
@@ -124,7 +127,7 @@
         </section>
 
         <!-- ===============================================================
-             MÓDULO 2: GLOSARIO (COMPACTO Y PROPORCIONAL)
+             MÓDULO 2: GLOSARIO
              =============================================================== -->
         <section id="modulo2" class="modulo">
             <div class="teoria-layout">
@@ -213,7 +216,7 @@
                     <div id="cajaDetalleTeoria" class="detalle-teoria">
                         <h2 id="tituloConcepto">👑 Nodo Raíz</h2>
                         <p id="textoConcepto">
-                            Es el primer elemento del árbol binario y el único que no tiene padre. Todas las operaciones de inserción, búsqueda y recorrido comienzan siempre desde la Raíz.
+                            Es el nodo superior donde comienza el árbol. No tiene padre y su nivel siempre es 0. En el diagrama de abajo, el nodo 50 es la Raíz.
                         </p>
                     </div>
                     <div id="contenedorCanvasTeoria" class="contenedor-canvas-teoria">
@@ -224,7 +227,7 @@
         </section>
 
         <!-- ===============================================================
-             MÓDULO 3: QUIZ PERSONALIZABLE (CON INICIO MANUAL Y RESUMEN WORDLE)
+             MÓDULO 3: QUIZ PERSONALIZABLE
              =============================================================== -->
         <section id="modulo3" class="modulo">
 
@@ -273,7 +276,7 @@
             <!-- Mensaje de error si el usuario ingresa más de 20 preguntas o un número inválido -->
             <div id="errorConfigQuiz" class="feedback-quiz incorrecto oculto" style="margin-bottom: 14px;"></div>
 
-            <!-- Pantalla de Espera (Lobby) antes de que el usuario inicie el Quiz -->
+            <!-- Pantalla de Espera (Lobby) -->
             <div id="quizLobby" class="quiz-lobby">
                 <div class="lobby-icono">🎯</div>
                 <h2>Configura tu Quiz antes de comenzar</h2>
@@ -285,7 +288,7 @@
                 </button>
             </div>
 
-            <!-- Contenido activo del Quiz (Oculto hasta que el usuario lo inicie) -->
+            <!-- Contenido activo del Quiz -->
             <div id="quizContenidoActivo" class="oculto">
                 <div class="quiz-header">
                     <div>
@@ -339,8 +342,8 @@
                                 <input type="text" inputmode="numeric" id="inputRespuestaAltura" autocomplete="off" placeholder="Ej: 3" maxlength="2">
                             </div>
                             <div class="campo-quiz">
-                                <label>Orden (Total de nodos):</label>
-                                <input type="text" inputmode="numeric" id="inputRespuestaOrden" autocomplete="off" placeholder="Ej: 6" maxlength="3">
+                                <label>Orden (Árbol binario):</label>
+                                <input type="text" inputmode="numeric" id="inputRespuestaOrden" autocomplete="off" placeholder="Ej: 2" maxlength="3">
                             </div>
                         </div>
 
@@ -394,7 +397,8 @@
         </section>
 
     </main>
-<!-- Carga modular de scripts por responsabilidad -->
+
+    <!-- Carga modular de scripts por responsabilidad -->
     <script src="Nodo.js"></script>
     <script src="ArbolBinario.js"></script>
     <script src="RenderizadorCanvas.js"></script>

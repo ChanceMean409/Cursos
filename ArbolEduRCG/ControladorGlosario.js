@@ -2,7 +2,7 @@
 const diccionarioTeoria = {
     raiz: {
         titulo: '👑 Nodo Raíz',
-        texto: 'Es el nodo superior donde comienza el árbol. No tiene padre y es el punto de partida de toda la estructura. En el diagrama de abajo, el nodo 50 es la Raíz.'
+        texto: 'Es el nodo superior donde comienza el árbol. No tiene padre y su nivel siempre es 0. En el diagrama de abajo, el nodo 50 es la Raíz.'
     },
     padres: {
         titulo: '🧭 Nodos Padres',
@@ -22,7 +22,7 @@ const diccionarioTeoria = {
     },
     propiedades: {
         titulo: '📐 Grado, Nivel, Altura y Orden',
-        texto: '• GRADO: Máximo de hijos que tiene un nodo (máx. 2).\n• NIVEL: Generación de cada escalón del árbol (1, 2, 3...).\n• ALTURA: Total de niveles del árbol (Altura = 3).\n• ORDEN: Capacidad máxima de hijos por nodo en un árbol binario (Orden = 2).'
+        texto: '• GRADO: Máximo de hijos que tiene un nodo (máx. 2).\n• NIVEL: Distancia desde la raíz (Raíz = Nivel 0).\n• ALTURA: Total de niveles del árbol (Altura = 3).\n• ORDEN: Capacidad máxima de hijos en un árbol binario (Orden = 2).'
     },
     preorden: {
         titulo: '1️⃣ Recorrido Preorden (Raíz ➔ Izquierda ➔ Derecha)',
@@ -41,6 +41,12 @@ const diccionarioTeoria = {
 let conceptoTeoriaActivo = 'raiz';
 let contadorFramesTeoria = 0;
 
+// Asigna colores aleatorios a los 5 nodos de demostración del glosario
+const coloresDemoGlosario = Array.from({ length: 5 }, () => {
+    return PALETA_COLORES_NODOS[Math.floor(Math.random() * PALETA_COLORES_NODOS.length)];
+});
+
+// Cambia el concepto activo cuando el usuario selecciona una tarjeta del glosario
 function mostrarConcepto(clave, tarjetaElemento) {
     conceptoTeoriaActivo = clave;
     contadorFramesTeoria = 0;
@@ -51,6 +57,7 @@ function mostrarConcepto(clave, tarjetaElemento) {
     document.getElementById('textoConcepto').textContent = diccionarioTeoria[clave].texto;
 }
 
+// Dibuja el árbol demostrativo del glosario y resalta los nodos según el tema seleccionado
 function dibujarGlosarioAdaptativo() {
     const { ctx, ancho, alto } = ajustarCanvasNitido('canvasTeoria', 'contenedorCanvasTeoria');
     if (!ctx) return;
@@ -66,13 +73,12 @@ function dibujarGlosarioAdaptativo() {
     const y1 = Math.round(alto * 0.50);
     const y2 = Math.round(alto * 0.78);
 
-    // Cada nodo tiene un color distinto
     const nodos = [
-        { id: 0, dato: '50', x: cx, y: y0, relleno: '#0284c7', borde: '#38bdf8' },
-        { id: 1, dato: '30', x: cx - sepX1, y: y1, relleno: '#e11d48', borde: '#fb7185' },
-        { id: 2, dato: '70', x: cx + sepX1, y: y1, relleno: '#059669', borde: '#34d399' },
-        { id: 3, dato: '20', x: cx - sepX1 - sepX2, y: y2, relleno: '#d97706', borde: '#fbbf24' },
-        { id: 4, dato: '40', x: cx - sepX1 + sepX2, y: y2, relleno: '#7c3aed', borde: '#a78bfa' }
+        { id: 0, dato: '50', x: cx, y: y0, relleno: coloresDemoGlosario[0].relleno, borde: coloresDemoGlosario[0].borde },
+        { id: 1, dato: '30', x: cx - sepX1, y: y1, relleno: coloresDemoGlosario[1].relleno, borde: coloresDemoGlosario[1].borde },
+        { id: 2, dato: '70', x: cx + sepX1, y: y1, relleno: coloresDemoGlosario[2].relleno, borde: coloresDemoGlosario[2].borde },
+        { id: 3, dato: '20', x: cx - sepX1 - sepX2, y: y2, relleno: coloresDemoGlosario[3].relleno, borde: coloresDemoGlosario[3].borde },
+        { id: 4, dato: '40', x: cx - sepX1 + sepX2, y: y2, relleno: coloresDemoGlosario[4].relleno, borde: coloresDemoGlosario[4].borde }
     ];
 
     if (conceptoTeoriaActivo === 'subarboles') {
@@ -98,12 +104,12 @@ function dibujarGlosarioAdaptativo() {
             ctx.fillStyle = '#38bdf8';
             ctx.font = 'bold 12px Segoe UI';
             ctx.textAlign = 'left';
-            ctx.fillText(`Nivel ${idx + 1}`, 24, ny - 8);
+            ctx.fillText(`Nivel ${idx}`, 24, ny - 8);
         });
         ctx.fillStyle = '#fbbf24';
         ctx.font = 'bold 13px Segoe UI';
         ctx.textAlign = 'center';
-        ctx.fillText('Grado = 2  |  Nivel máx = 3  |  Altura = 3  |  Orden = 2', cx, alto - 14);
+        ctx.fillText('Grado = 2  |  Nivel máx = 2  |  Altura = 3  |  Orden = 2', cx, alto - 14);
     }
 
     const enlaces = [[0, 1], [0, 2], [1, 3], [1, 4]];
