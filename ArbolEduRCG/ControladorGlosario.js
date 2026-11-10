@@ -13,7 +13,7 @@ const diccionarioTeoria = {
         texto: 'Son los nodos que descienden directamente de un nodo padre. Cada nodo puede tener como máximo dos hijos: Izquierdo (menores) y Derecho (mayores o iguales).'
     },
     hojas: {
-        titulo: '🍃 Nodos Hojas (Terminales)',
+        titulo: '🍃 Nodos Hojas',
         texto: 'Son los nodos ubicados al final de las ramas que NO tienen ningún hijo. Aquí los nodos 20, 40 y 70 son Hojas.'
     },
     subarboles: {
