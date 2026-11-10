@@ -229,7 +229,7 @@ function verificarRespuestaQuiz(porTiempoAgotado = false) {
     const corrGrado = arbolQuiz.obtenerGrado();
     const corrNivel = arbolQuiz.obtenerNivelMaximo();
     const corrAltura = arbolQuiz.obtenerAltura();
-    const corrOrden = arbolQuiz.obtenerTotalNodos();
+    const corrOrden = arbolQuiz.obtenerOrden();
 
     let aciertosPregunta = 0;
     let totalItemsPregunta = 0;
