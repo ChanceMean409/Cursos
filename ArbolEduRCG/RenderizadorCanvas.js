@@ -1,4 +1,4 @@
-// Ajusta la resolución del canvas según la pantalla del dispositivo (PC o celular)
+// Ajusta la resolución del canvas según la pantalla del dispositivo
 function ajustarCanvasNitido(idCanvas, idContenedor) {
     const canvas = document.getElementById(idCanvas);
     const contenedor = document.getElementById(idContenedor);
@@ -105,7 +105,7 @@ function dibujarArbolEnCanvas(idCanvas, idContenedor, arbol, nodoActual, visitad
 
     const radioNodo = posicionarYAutoAjustarArbol(arbol, ancho, alto);
     dibujarEnlaces(ctx, arbol.raiz, visitados);
-    dibujarNodosPedagogicos(ctx, arbol.raiz, arbol.raiz, nodoActual, visitados, radioNodo);
+    dibujarNodosColores(ctx, arbol.raiz, nodoActual, visitados, radioNodo);
 
     if (mostrarFlecha && flechaAnimada.visible) {
         dibujarFlechaPuntero(ctx, radioNodo);
@@ -154,22 +154,11 @@ function trazarLineaConFlecha(ctx, padre, hijo, visitados) {
     }
 }
 
-// Define el color del nodo según su función: Azul (Raíz), Verde (Hoja) o Violeta (Padre)
-function obtenerEstiloPedagogicoNodo(nodo, raizArbol) {
-    if (nodo === raizArbol) {
-        return { relleno: '#0284c7', borde: '#38bdf8' };
-    }
-    if (nodo.izquierdo === null && nodo.derecho === null) {
-        return { relleno: '#059669', borde: '#34d399' };
-    }
-    return { relleno: '#6366f1', borde: '#a5b4fc' };
-}
-
-// Dibuja el círculo y el texto de cada nodo de forma recursiva
-function dibujarNodosPedagogicos(ctx, nodo, raizArbol, nodoActual, visitados, radio) {
+// Dibuja cada nodo usando su color individual asignado al crearse
+function dibujarNodosColores(ctx, nodo, nodoActual, visitados, radio) {
     if (!nodo) return;
     const fueProcesado = nodosProcesados.includes(nodo);
-    const estilo = obtenerEstiloPedagogicoNodo(nodo, raizArbol);
+    const estilo = nodo.color || { relleno: '#0284c7', borde: '#38bdf8' };
 
     if (nodo === nodoActual) {
         ctx.beginPath();
@@ -195,8 +184,8 @@ function dibujarNodosPedagogicos(ctx, nodo, raizArbol, nodoActual, visitados, ra
     ctx.textBaseline = 'middle';
     ctx.fillText(nodo.dato, nodo.x, nodo.y);
 
-    dibujarNodosPedagogicos(ctx, nodo.izquierdo, raizArbol, nodoActual, visitados, radio);
-    dibujarNodosPedagogicos(ctx, nodo.derecho, raizArbol, nodoActual, visitados, radio);
+    dibujarNodosColores(ctx, nodo.izquierdo, nodoActual, visitados, radio);
+    dibujarNodosColores(ctx, nodo.derecho, nodoActual, visitados, radio);
 }
 
 // Dibuja y mueve suavemente la flecha indicadora sobre el nodo que se está visitando

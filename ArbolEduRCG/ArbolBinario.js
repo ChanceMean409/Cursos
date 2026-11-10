@@ -1,8 +1,8 @@
 // Clase que administra la lógica y operaciones del Árbol Binario de Búsqueda
 class ArbolBinario {
     constructor(tipo = 'NUMEROS') {
-        this.raiz = null;  // Nodo principal del árbol
-        this.tipo = tipo;  // Modo de comparación: 'NUMEROS' o 'LETRAS'
+        this.raiz = null;
+        this.tipo = tipo;
     }
 
     // Compara dos valores: devuelve -1 si a < b, 1 si a > b, y 0 si son iguales
@@ -27,16 +27,17 @@ class ArbolBinario {
         }
     }
 
-    // Calcula la altura total del árbol de forma recursiva
+    // Calcula la cantidad de niveles desde la raíz hasta la hoja más lejana
     obtenerAltura(nodo = this.raiz) {
         if (nodo === null) return 0;
         return 1 + Math.max(this.obtenerAltura(nodo.izquierdo), this.obtenerAltura(nodo.derecho));
     }
 
-    // Devuelve el nivel máximo alcanzado (la raíz empieza en nivel 0)
+    // Devuelve el nivel máximo del árbol (contando la Raíz desde Nivel 1)
+    // Nota: Si tu maestra cuenta la Raíz como Nivel 0, cambia esta línea a: return this.obtenerAltura(this.raiz) - 1;
     obtenerNivelMaximo() {
         if (this.raiz === null) return 0;
-        return this.obtenerAltura(this.raiz) - 1;
+        return this.obtenerAltura(this.raiz);
     }
 
     // Obtiene el grado del árbol (máximo de hijos directos que tiene un nodo: 0, 1 o 2)
@@ -52,14 +53,19 @@ class ArbolBinario {
         );
     }
 
-    // Cuenta la cantidad total de nodos en el árbol (Orden)
+    // Devuelve el Orden del árbol (en un árbol binario por definición siempre es 2)
+    obtenerOrden() {
+        if (this.raiz === null) return 0;
+        return 2;
+    }
+
+    // Cuenta la cantidad total de nodos (Peso del árbol)
     obtenerTotalNodos(nodo = this.raiz) {
         if (nodo === null) return 0;
         return 1 + this.obtenerTotalNodos(nodo.izquierdo) + this.obtenerTotalNodos(nodo.derecho);
     }
 
     // Inserta un nodo y guarda cada paso recorrido para animar la flecha
-    // Los valores menores van a la izquierda y los mayores o repetidos van a la derecha
     insertarConPasos(valor) {
         const pasos = [];
         if (this.raiz === null) {
@@ -187,7 +193,7 @@ class ArbolBinario {
         this.raiz = this._eliminarRecursivo(this.raiz, valor);
     }
 
-    // Busca el nodo a eliminar y reestructura los enlaces (casos: hoja, 1 hijo o 2 hijos)
+    // Busca el nodo a eliminar y reestructura los enlaces
     _eliminarRecursivo(nodoActual, valor) {
         if (nodoActual === null) return null;
 
@@ -200,7 +206,6 @@ class ArbolBinario {
             if (nodoActual.izquierdo === null) return nodoActual.derecho;
             if (nodoActual.derecho === null) return nodoActual.izquierdo;
 
-            // Si tiene 2 hijos, se reemplaza por el valor mínimo del subárbol derecho (Sucesor Inorden)
             let sucesor = this._encontrarMinimo(nodoActual.derecho);
             nodoActual.dato = sucesor.dato;
             nodoActual.derecho = this._eliminarRecursivo(nodoActual.derecho, sucesor.dato);
@@ -216,7 +221,7 @@ class ArbolBinario {
         return nodo;
     }
 
-    // Genera la lista de pasos para el recorrido Preorden (Raíz - Izquierda - Derecha)
+    // Genera la lista de pasos para el recorrido Preorden
     obtenerPasosPreorden() {
         const pasos = [];
         this._preorden(this.raiz, pasos);
@@ -257,7 +262,7 @@ class ArbolBinario {
         }
     }
 
-    // Genera la lista de pasos para el recorrido Inorden (Izquierda - Raíz - Derecha)
+    // Genera la lista de pasos para el recorrido Inorden
     obtenerPasosInorden() {
         const pasos = [];
         this._inorden(this.raiz, pasos);
@@ -298,7 +303,7 @@ class ArbolBinario {
         }
     }
 
-    // Genera la lista de pasos para el recorrido Postorden (Izquierda - Derecha - Raíz)
+    // Genera la lista de pasos para el recorrido Postorden
     obtenerPasosPostorden() {
         const pasos = [];
         this._postorden(this.raiz, pasos);

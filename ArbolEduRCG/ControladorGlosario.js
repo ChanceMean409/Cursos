@@ -2,11 +2,11 @@
 const diccionarioTeoria = {
     raiz: {
         titulo: '👑 Nodo Raíz',
-        texto: 'Es el nodo superior donde comienza el árbol (color Azul Cian). No tiene padre y su nivel siempre es 0. En el diagrama de abajo, el nodo 50 es la Raíz.'
+        texto: 'Es el nodo superior donde comienza el árbol. No tiene padre y es el punto de partida de toda la estructura. En el diagrama de abajo, el nodo 50 es la Raíz.'
     },
     padres: {
         titulo: '🧭 Nodos Padres',
-        texto: 'Son los nodos que tienen al menos un hijo conectado debajo de ellos (color Violeta). En el ejemplo, el 50 es padre de 30 y 70, y el 30 es padre de 20 y 40.'
+        texto: 'Son los nodos que tienen al menos un hijo conectado debajo de ellos. En el ejemplo, el 50 es padre de 30 y 70, y el 30 es padre de 20 y 40.'
     },
     hijos: {
         titulo: '🌱 Nodos Hijos',
@@ -14,15 +14,15 @@ const diccionarioTeoria = {
     },
     hojas: {
         titulo: '🍃 Nodos Hojas (Terminales)',
-        texto: 'Son los nodos ubicados al final de las ramas que NO tienen ningún hijo (color Verde Esmeralda). Aquí los nodos 20, 40 y 70 son Hojas.'
+        texto: 'Son los nodos ubicados al final de las ramas que NO tienen ningún hijo. Aquí los nodos 20, 40 y 70 son Hojas.'
     },
     subarboles: {
         titulo: '🌿 Subárboles',
-        texto: 'Cualquier hijo junto con sus descendientes forma un Subárbol. El recuadro verde muestra el Subárbol Izquierdo completo que nace en el nodo 30.'
+        texto: 'Cualquier hijo junto con sus descendientes forma un Subárbol. El recuadro muestra el Subárbol Izquierdo completo que nace en el nodo 30.'
     },
     propiedades: {
         titulo: '📐 Grado, Nivel, Altura y Orden',
-        texto: '• GRADO: Máximo de hijos que tiene un nodo (máx. 2).\n• NIVEL: Distancia desde la raíz (Raíz = Nivel 0).\n• ALTURA: Total de niveles del árbol (Altura = 3).\n• ORDEN: Cantidad total de nodos (5 nodos).'
+        texto: '• GRADO: Máximo de hijos que tiene un nodo (máx. 2).\n• NIVEL: Generación de cada escalón del árbol (1, 2, 3...).\n• ALTURA: Total de niveles del árbol (Altura = 3).\n• ORDEN: Capacidad máxima de hijos por nodo en un árbol binario (Orden = 2).'
     },
     preorden: {
         titulo: '1️⃣ Recorrido Preorden (Raíz ➔ Izquierda ➔ Derecha)',
@@ -41,7 +41,6 @@ const diccionarioTeoria = {
 let conceptoTeoriaActivo = 'raiz';
 let contadorFramesTeoria = 0;
 
-// Cambia el concepto activo cuando el usuario selecciona una tarjeta del glosario
 function mostrarConcepto(clave, tarjetaElemento) {
     conceptoTeoriaActivo = clave;
     contadorFramesTeoria = 0;
@@ -52,7 +51,6 @@ function mostrarConcepto(clave, tarjetaElemento) {
     document.getElementById('textoConcepto').textContent = diccionarioTeoria[clave].texto;
 }
 
-// Dibuja el árbol demostrativo del glosario y resalta los nodos según el tema seleccionado
 function dibujarGlosarioAdaptativo() {
     const { ctx, ancho, alto } = ajustarCanvasNitido('canvasTeoria', 'contenedorCanvasTeoria');
     if (!ctx) return;
@@ -68,12 +66,13 @@ function dibujarGlosarioAdaptativo() {
     const y1 = Math.round(alto * 0.50);
     const y2 = Math.round(alto * 0.78);
 
+    // Cada nodo tiene un color distinto
     const nodos = [
         { id: 0, dato: '50', x: cx, y: y0, relleno: '#0284c7', borde: '#38bdf8' },
-        { id: 1, dato: '30', x: cx - sepX1, y: y1, relleno: '#6366f1', borde: '#a5b4fc' },
+        { id: 1, dato: '30', x: cx - sepX1, y: y1, relleno: '#e11d48', borde: '#fb7185' },
         { id: 2, dato: '70', x: cx + sepX1, y: y1, relleno: '#059669', borde: '#34d399' },
-        { id: 3, dato: '20', x: cx - sepX1 - sepX2, y: y2, relleno: '#059669', borde: '#34d399' },
-        { id: 4, dato: '40', x: cx - sepX1 + sepX2, y: y2, relleno: '#059669', borde: '#34d399' }
+        { id: 3, dato: '20', x: cx - sepX1 - sepX2, y: y2, relleno: '#d97706', borde: '#fbbf24' },
+        { id: 4, dato: '40', x: cx - sepX1 + sepX2, y: y2, relleno: '#7c3aed', borde: '#a78bfa' }
     ];
 
     if (conceptoTeoriaActivo === 'subarboles') {
@@ -99,12 +98,12 @@ function dibujarGlosarioAdaptativo() {
             ctx.fillStyle = '#38bdf8';
             ctx.font = 'bold 12px Segoe UI';
             ctx.textAlign = 'left';
-            ctx.fillText(`Nivel ${idx}`, 24, ny - 8);
+            ctx.fillText(`Nivel ${idx + 1}`, 24, ny - 8);
         });
         ctx.fillStyle = '#fbbf24';
         ctx.font = 'bold 13px Segoe UI';
         ctx.textAlign = 'center';
-        ctx.fillText('Grado = 2  |  Altura = 3  |  Orden = 5 nodos', cx, alto - 14);
+        ctx.fillText('Grado = 2  |  Nivel máx = 3  |  Altura = 3  |  Orden = 2', cx, alto - 14);
     }
 
     const enlaces = [[0, 1], [0, 2], [1, 3], [1, 4]];

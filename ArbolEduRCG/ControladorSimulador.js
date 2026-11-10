@@ -91,11 +91,12 @@ function cambiarTipoArbol(nuevoModo) {
 }
 
 // Actualiza los contadores de Grado, Nivel, Altura y Orden en la barra superior
+// Actualiza los contadores de Grado, Nivel, Altura y Orden en la barra superior
 function actualizarPanelMetricasSimulador() {
     document.getElementById('lblGradoArbol').textContent = arbolSimulador.obtenerGrado();
     document.getElementById('lblNivelArbol').textContent = arbolSimulador.obtenerNivelMaximo();
     document.getElementById('lblAlturaArbol').textContent = arbolSimulador.obtenerAltura();
-    document.getElementById('lblOrdenArbol').textContent = arbolSimulador.obtenerTotalNodos();
+    document.getElementById('lblOrdenArbol').textContent = arbolSimulador.obtenerOrden();
 }
 
 // Verifica que el usuario ingrese enteros sin decimales o letras válidas según el modo activo
