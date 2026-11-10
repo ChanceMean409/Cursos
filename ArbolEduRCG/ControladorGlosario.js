@@ -9,7 +9,7 @@ const diccionarioTeoria = {
         texto: 'Son los nodos que tienen al menos un hijo conectado debajo de ellos. En el ejemplo, el 50 es padre de 30 y 70, y el 30 es padre de 20 y 40.'
     },
     hijos: {
-        titulo: '🌱 Nodos Hijos de su madre',
+        titulo: '🌱 Nodos Hijos',
         texto: 'Son los nodos que descienden directamente de un nodo padre. Cada nodo puede tener como máximo dos hijos: Izquierdo (menores) y Derecho (mayores o iguales).'
     },
     hojas: {
